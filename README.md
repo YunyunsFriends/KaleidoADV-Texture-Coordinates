@@ -1,7 +1,7 @@
 # KAW Texture Coordinates (Name subject to change.)
-This was made to help with mapping out textures for Konosuba: Judgement on this Greedy Game! Because manually determining is pretty tedious and time consuming.
+This was made to help with mapping out textures for Konosuba: Judgement on this Greedy Game! Because manually mapping is pretty tedious and time consuming.
 ## How to use:
-1. Open this site: 
+1. Open this site: https://yunyunsfriends.github.io/KaleidoADV-Texture-Coordinates/
 2. Obtain texture file(s) and JSON by decompiling PSB with Freemote.
 3. Upload Texture and JSON files to site.
 4. Select corresponding texture from texture drop down.
