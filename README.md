@@ -12,4 +12,4 @@ This was made to help with mapping out textures for Konosuba: Judgement on this 
 ## To Dos:
 - Allow for naming of Icons. (Maybe update the metadata field?)
 - Add coordinate remapping.
-- Add JSON editing and saving.
+- Add JSON editing/saving.
