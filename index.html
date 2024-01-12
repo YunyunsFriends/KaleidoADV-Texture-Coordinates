@@ -76,7 +76,7 @@
             flex-direction: column;
         }
     </style>
-    <title>Yunynn's Friends Pinpoint</title>
+    <title>Yunyun's Friends Pinpoint</title>
 </head>
 <body>
 
@@ -86,9 +86,9 @@
 
     <div id="imageDimensions">
         <label for="imageWidth">Image Width:</label>
-        <input type="number" id="imageWidth" readonly>
+        <input type="number" id="imageWidth" placeholder="Image width" readonly>
         <label for="imageHeight">Image Height:</label>
-        <input type="number" id="imageHeight" readonly>
+        <input type="number" id="imageHeight" placeholder="Image height" readonly>
     </div>
 
     <label for="jsonUpload">Upload JSON File:</label>
@@ -106,9 +106,9 @@
 
     <div id="coordinates">
         <label for="xCoordinate">X Coordinate (left):</label>
-        <input type="number" id="xCoordinate" readonly>
+        <input type="number" id="xCoordinate" placeholder="X coordinate" readonly>
         <label for="yCoordinate">Y Coordinate (top):</label>
-        <input type="number" id="yCoordinate" readonly>
+        <input type="number" id="yCoordinate" placeholder="Y coordinate" readonly>
 
         <div id="colorChangeForm">
             <label for="backgroundColorInput">Background Color:</label>
@@ -116,13 +116,10 @@
             <button type="button" onclick="changeBackgroundColor()">Apply</button>
         </div>
     </div>
-    
-    <div>
-        <label for="iconMetadata">Metadata:</label>
-        <textarea id="iconMetadata" placeholder="Icon Name"></textarea>
-    </div>
 
     <div id="iconDetails">
+        <label for="iconMetadata">Metadata:</label>
+        <textarea id="iconMetadata" placeholder="Metadata"></textarea>
         <label for="iconWidth">Width:</label>
         <input type="number" id="iconWidth" class="editableField" placeholder="Width">
         <label for="iconHeight">Height:</label>
@@ -135,13 +132,16 @@
 
     <div id="positionDetails">
         <label for="iconLeft">Left:</label>
-        <input type="number" id="iconLeft" class="editableField" placeholder="X">
+        <input type="number" id="iconLeft" class="editableField" placeholder="Left">
         <label for="iconTop">Top:</label>
-        <input type="number" id="iconTop" class="editableField" placeholder="Y">
+        <input type="number" id="iconTop" class="editableField" placeholder="Top">
     </div>
 
     <button type="button" onclick="saveIconDetails()">Save Icon Details</button>
     <button type="button" onclick="saveUpdatedJson()">Save Updated JSON</button>
+    
+    <label for="itemName">Icon Name:</label>
+    <input type="text" id="itemName" placeholder="Item name">
 
 </div>
 
@@ -151,7 +151,7 @@
 </div>
 
 <script>
-    var jsonData;
+    var jsonData;  // Declare jsonData variable outside functions to make it accessible globally
 
     function handleImageUpload(event) {
         // Get the selected file from the input
@@ -187,6 +187,7 @@
 
         // Check if a file was selected
         if (file) {
+            // Create a FileReader to read the JSON file
             var reader = new FileReader();
 
             // Set up the onload event for the reader
@@ -347,6 +348,19 @@
         document.getElementById('imageContainer').appendChild(newPinpoint);
     }
 
+    function saveItemName() {
+        // Get the entered coordinates, "tex," and name from the input fields
+        var x = document.getElementById('xCoordinate').value;
+        var selectedTex = document.getElementById('texDropdown').value;
+        var name = document.getElementById('itemName').value;
+
+        // Update the name in the JSON
+        jsonData.source[selectedTex].icon[x].itemName = name;
+
+        // Update the name in the "Icon" dropdown
+        updateDropdownName(x, name);
+    }
+
     function changeBackgroundColor() {
         // Get the selected color from the input
         var newColor = document.getElementById('backgroundColorInput').value;
@@ -366,6 +380,7 @@
         document.getElementById('xCoordinate').value = x;
         document.getElementById('yCoordinate').value = y;
 
+        // Remove previous pinpoints
         clearPinpoints();
 
         // Set the position of the new pinpoint
