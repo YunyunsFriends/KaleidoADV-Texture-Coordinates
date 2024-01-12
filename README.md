@@ -12,4 +12,5 @@ This was made to help with mapping out textures for Konosuba: Judgement on this 
 ## Known working games:
 - Konosuba: Judgement on this Greedy Game!
 - Plastic Memories
+###
 Most texture/JSON combos from Kaleido ADV Workshop games should work.
