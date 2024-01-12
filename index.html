@@ -66,221 +66,288 @@
             cursor: pointer;
             transform: translate(-50%, -50%);
         }
+
+        .editableField {
+            width: 80px;
+        }
+
+        #iconDetails, #positionDetails {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
-    <title>Pinpoint Coordinates</title>
+    <title>Yunynn's Friends Pinpoint</title>
 </head>
 <body>
 
-    <div id="container">
-        <label for="imageUpload">Upload Image:</label>
-        <input type="file" accept="image/*" id="imageUpload" onchange="handleImageUpload(event)">
+<div id="container">
+    <label for="imageUpload">Upload Image:</label>
+    <input type="file" accept="image/*" id="imageUpload" onchange="handleImageUpload(event)">
 
-        <div id="imageDimensions">
-            <label for="imageWidth">Image Width:</label>
-            <input type="number" id="imageWidth" placeholder="Image width" readonly>
-            <label for="imageHeight">Image Height:</label>
-            <input type="number" id="imageHeight" placeholder="Image height" readonly>
-        </div>
-        
-        <label for="jsonUpload">Upload JSON File:</label>
-        <input type="file" accept=".json" id="jsonUpload" onchange="handleJsonUpload(event)">
+    <div id="imageDimensions">
+        <label for="imageWidth">Image Width:</label>
+        <input type="number" id="imageWidth" readonly>
+        <label for="imageHeight">Image Height:</label>
+        <input type="number" id="imageHeight" readonly>
+    </div>
 
-        <label for="texDropdown">Select a texure:</label>
-        <select id="texDropdown" onchange="selectTex()">
-            <option value="">Select</option>
-        </select>
+    <label for="jsonUpload">Upload JSON File:</label>
+    <input type="file" accept=".json" id="jsonUpload" onchange="handleJsonUpload(event)">
 
-        <label for="iconDropdown">Select an icon:</label>
-        <select id="iconDropdown" onchange="selectIcon()">
-            <option value="">Select</option>
-        </select>
+    <label for="texDropdown">Select a texure:</label>
+    <select id="texDropdown" onchange="selectTex()">
+        <option value="">Select</option>
+    </select>
 
-        <label for="itemName">Icon Name:</label>
-        <input type="text" id="itemName" placeholder="Item name">
+    <label for="iconDropdown">Select an icon:</label>
+    <select id="iconDropdown" onchange="selectIcon()">
+        <option value="">Select</option>
+    </select>
 
-        <div id="coordinates">
-            <label for="xCoordinate">X Coordinate (left):</label>
-            <input type="number" id="xCoordinate" placeholder="X coordinate" readonly>
-            <label for="yCoordinate">Y Coordinate (top):</label>
-            <input type="number" id="yCoordinate" placeholder="Y coordinate" readonly>
-            
+    <div id="coordinates">
+        <label for="xCoordinate">X Coordinate (left):</label>
+        <input type="number" id="xCoordinate" readonly>
+        <label for="yCoordinate">Y Coordinate (top):</label>
+        <input type="number" id="yCoordinate" readonly>
+
         <div id="colorChangeForm">
             <label for="backgroundColorInput">Background Color:</label>
             <input type="color" id="backgroundColorInput" value="#f4f4f4">
             <button type="button" onclick="changeBackgroundColor()">Apply</button>
-            </div>
         </div>
-
-
+    </div>
+    
+    <div>
+        <label for="iconMetadata">Metadata:</label>
+        <textarea id="iconMetadata" placeholder="Icon Name"></textarea>
     </div>
 
-    <div id="imageContainer">
-        <img id="pinpointImage" alt="Image not selected">
-        <div id="jsonPinpoints"></div>
+    <div id="iconDetails">
+        <label for="iconWidth">Width:</label>
+        <input type="number" id="iconWidth" class="editableField" placeholder="Width">
+        <label for="iconHeight">Height:</label>
+        <input type="number" id="iconHeight" class="editableField" placeholder="Height">
+        <label for="iconOriginX">Origin X:</label>
+        <input type="number" id="iconOriginX" class="editableField" placeholder="Origin X">
+        <label for="iconOriginY">Origin Y:</label>
+        <input type="number" id="iconOriginY" class="editableField" placeholder="Origin Y">
     </div>
 
-    <script>
-        var jsonData;  // Declare jsonData variable outside functions to make it accessible globally
+    <div id="positionDetails">
+        <label for="iconLeft">Left:</label>
+        <input type="number" id="iconLeft" class="editableField" placeholder="X">
+        <label for="iconTop">Top:</label>
+        <input type="number" id="iconTop" class="editableField" placeholder="Y">
+    </div>
 
-        function handleImageUpload(event) {
-            // Get the selected file from the input
-            var file = event.target.files[0];
+    <button type="button" onclick="saveIconDetails()">Save Icon Details</button>
+    <button type="button" onclick="saveUpdatedJson()">Save Updated JSON</button>
 
-            // Check if a file was selected
-            if (file) {
-                // Create a FileReader to read the image
-                var reader = new FileReader();
+</div>
 
-                // Set up the onload event for the reader
-                reader.onload = function(e) {
-                    // Set the source of the image to the uploaded file
-                    document.getElementById('pinpointImage').src = e.target.result;
+<div id="imageContainer">
+    <img id="pinpointImage" alt="Image not selected">
+    <div id="jsonPinpoints"></div>
+</div>
 
-                    // Get image dimensions and populate width and height inputs
-                    var image = new Image();
-                    image.src = e.target.result;
-                    image.onload = function() {
-                        document.getElementById('imageWidth').value = image.width;
-                        document.getElementById('imageHeight').value = image.height;
-                    };
+<script>
+    var jsonData;
+
+    function handleImageUpload(event) {
+        // Get the selected file from the input
+        var file = event.target.files[0];
+
+        // Check if a file was selected
+        if (file) {
+            // Create a FileReader to read the image
+            var reader = new FileReader();
+
+            // Set up the onload event for the reader
+            reader.onload = function(e) {
+                // Set the source of the image to the uploaded file
+                document.getElementById('pinpointImage').src = e.target.result;
+
+                // Get image dimensions and populate width and height inputs
+                var image = new Image();
+                image.src = e.target.result;
+                image.onload = function() {
+                    document.getElementById('imageWidth').value = image.width;
+                    document.getElementById('imageHeight').value = image.height;
                 };
+            };
 
-                // Read the image as a data URL
-                reader.readAsDataURL(file);
-            }
+            // Read the image as a data URL
+            reader.readAsDataURL(file);
         }
+    }
 
-        function handleJsonUpload(event) {
-            // Get the selected JSON file
-            var file = event.target.files[0];
+    function handleJsonUpload(event) {
+        // Get the selected JSON file
+        var file = event.target.files[0];
 
-            // Check if a file was selected
-            if (file) {
-                // Create a FileReader to read the JSON file
-                var reader = new FileReader();
+        // Check if a file was selected
+        if (file) {
+            var reader = new FileReader();
 
-                // Set up the onload event for the reader
-                reader.onload = function(e) {
-                    // Parse the JSON data using JSON5 library
-                    jsonData = JSON5.parse(e.target.result);
+            // Set up the onload event for the reader
+            reader.onload = function(e) {
+                // Parse the JSON data using JSON5 library
+                jsonData = JSON5.parse(e.target.result);
 
-                    // Get the "source" object
-                    var sources = jsonData.source;
+                // Get the "source" object
+                var sources = jsonData.source;
 
-                    // Populate the dropdown list with "tex" fields
-                    var texDropdown = document.getElementById('texDropdown');
-                    texDropdown.innerHTML = '<option value="">Select</option>';
-                    for (var key in sources) {
-                        if (sources.hasOwnProperty(key)) {
-                            var option = document.createElement('option');
-                            option.value = key;
-                            option.text = key;
-                            texDropdown.add(option);
-                        }
+                // Populate the dropdown list with "tex" fields
+                var texDropdown = document.getElementById('texDropdown');
+                texDropdown.innerHTML = '<option value="">Select</option>';
+                for (var key in sources) {
+                    if (sources.hasOwnProperty(key)) {
+                        var option = document.createElement('option');
+                        option.value = key;
+                        option.text = key;
+                        texDropdown.add(option);
                     }
-                };
-
-                // Read the JSON file as text
-                reader.readAsText(file);
-            }
-        }
-
-        function selectTex() {
-            // Get the selected "tex" from the dropdown
-            var selectedTex = document.getElementById('texDropdown').value;
-
-            // Get the "icon" object based on the selected "tex"
-            var icons = jsonData.source[selectedTex].icon;
-
-            // Populate the "Icon" dropdown with items under the selected "tex"
-            var iconDropdown = document.getElementById('iconDropdown');
-            iconDropdown.innerHTML = '<option value="">Select</option>';
-            for (var key in icons) {
-                if (icons.hasOwnProperty(key)) {
-                    var option = document.createElement('option');
-                    option.value = key;
-                    // Display name if available, otherwise display key
-                    option.text = icons[key].itemName || key;
-                    iconDropdown.add(option);
                 }
+            };
+
+            // Read the JSON file as text
+            reader.readAsText(file);
+        }
+    }
+
+    function selectTex() {
+        // Get the selected "tex" from the dropdown
+        var selectedTex = document.getElementById('texDropdown').value;
+
+        // Get the "icon" object based on the selected "tex"
+        var icons = jsonData.source[selectedTex].icon;
+
+        // Populate the "Icon" dropdown with items under the selected "tex"
+        var iconDropdown = document.getElementById('iconDropdown');
+        iconDropdown.innerHTML = '<option value="">Select</option>';
+        for (var key in icons) {
+            if (icons.hasOwnProperty(key)) {
+                var option = document.createElement('option');
+                option.value = key;
+                // Display name if available, otherwise display key
+                option.text = icons[key].itemName || key;
+                iconDropdown.add(option);
             }
         }
+    }
 
-        function selectIcon() {
-            // Get the selected "tex" and item from the dropdowns
-            var selectedTex = document.getElementById('texDropdown').value;
-            var selectedKey = document.getElementById('iconDropdown').value;
+    function selectIcon() {
+        // Get the selected "tex" and item from the dropdowns
+        var selectedTex = document.getElementById('texDropdown').value;
+        var selectedKey = document.getElementById('iconDropdown').value;
 
-            // Get the coordinates and name based on the selected "tex" and item
-            var x = jsonData.source[selectedTex].icon[selectedKey].left;
-            var y = jsonData.source[selectedTex].icon[selectedKey].top;
-            var name = jsonData.source[selectedTex].icon[selectedKey].itemName || '';
+        // Get the coordinates and name based on the selected "tex" and item
+        var x = jsonData.source[selectedTex].icon[selectedKey].left;
+        var y = jsonData.source[selectedTex].icon[selectedKey].top;
+        var name = jsonData.source[selectedTex].icon[selectedKey].itemName || '';
 
-            // Set the values of the input fields
-            document.getElementById('itemName').value = name;
-            document.getElementById('xCoordinate').value = x;
-            document.getElementById('yCoordinate').value = y;
+        // Set the values of the input fields
+        document.getElementById('itemName').value = name;
+        document.getElementById('xCoordinate').value = x;
+        document.getElementById('yCoordinate').value = y;
 
-            // Remove previous pinpoints
-            clearPinpoints();
+        // Set the values for the editable fields
+        document.getElementById('iconWidth').value = jsonData.source[selectedTex].icon[selectedKey].width;
+        document.getElementById('iconHeight').value = jsonData.source[selectedTex].icon[selectedKey].height;
+        document.getElementById('iconOriginX').value = jsonData.source[selectedTex].icon[selectedKey].originX;
+        document.getElementById('iconOriginY').value = jsonData.source[selectedTex].icon[selectedKey].originY;
+        document.getElementById('iconMetadata').value = jsonData.source[selectedTex].icon[selectedKey].metadata;
+        document.getElementById('iconLeft').value = jsonData.source[selectedTex].icon[selectedKey].left;
+        document.getElementById('iconTop').value = jsonData.source[selectedTex].icon[selectedKey].top;
 
-            // Set the position of the new pinpoint
-            createAndAppendPinpoint(x, y);
+        // Remove previous pinpoints
+        clearPinpoints();
+
+        // Set the position of the new pinpoint
+        createAndAppendPinpoint(x, y);
+    }
+
+    function saveIconDetails() {
+        // Get the entered values for the editable fields
+        var width = document.getElementById('iconWidth').value;
+        var height = document.getElementById('iconHeight').value;
+        var originX = document.getElementById('iconOriginX').value;
+        var originY = document.getElementById('iconOriginY').value;
+        var metadata = document.getElementById('iconMetadata').value;
+        var left = document.getElementById('iconLeft').value;
+        var top = document.getElementById('iconTop').value;
+
+        // Get the selected "tex" and item from the dropdowns
+        var selectedTex = document.getElementById('texDropdown').value;
+        var selectedKey = document.getElementById('iconDropdown').value;
+
+        // Update the values in the JSON
+        jsonData.source[selectedTex].icon[selectedKey].width = width;
+        jsonData.source[selectedTex].icon[selectedKey].height = height;
+        jsonData.source[selectedTex].icon[selectedKey].originX = originX;
+        jsonData.source[selectedTex].icon[selectedKey].originY = originY;
+        jsonData.source[selectedTex].icon[selectedKey].metadata = metadata;
+        jsonData.source[selectedTex].icon[selectedKey].left = left;
+        jsonData.source[selectedTex].icon[selectedKey].top = top;
+
+        // Update the name in the "Icon" dropdown
+        updateDropdownName(selectedKey, jsonData.source[selectedTex].icon[selectedKey].itemName);
+    }
+
+    function saveUpdatedJson() {
+        // Convert the updated JSON object to a string
+        var updatedJsonString = JSON5.stringify(jsonData, null, 2);
+
+        // Create a Blob containing the updated JSON data
+        var blob = new Blob([updatedJsonString], { type: 'application/json' });
+
+        // Create a download link and trigger the download
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'updated_data.json';
+        link.click();
+    }
+
+    function pinpointCoordinates() {
+        // Get the entered coordinates and name from the input fields
+        var x = document.getElementById('xCoordinate').value;
+        var y = document.getElementById('yCoordinate').value;
+        var name = document.getElementById('itemName').value;
+
+        // Remove previous pinpoints
+        clearPinpoints();
+
+        // Set the position of the new pinpoint
+        createAndAppendPinpoint(x, y);
+
+        // Update the name in the dropdown
+        updateDropdownName(x, name);
+    }
+
+    function updateDropdownName(key, name) {
+        // Update the "Icon" dropdown to display the name if available
+        var iconDropdown = document.getElementById('iconDropdown');
+        iconDropdown.options[iconDropdown.selectedIndex].text = name || key;
+    }
+
+    function clearPinpoints() {
+        // Remove all previous pinpoints
+        var previousPinpoints = document.getElementsByClassName('pinpoint');
+        while (previousPinpoints.length > 0) {
+            previousPinpoints[0].parentNode.removeChild(previousPinpoints[0]);
         }
+    }
 
-        function pinpointCoordinates() {
-            // Get the entered coordinates and name from the input fields
-            var x = document.getElementById('xCoordinate').value;
-            var y = document.getElementById('yCoordinate').value;
-            var name = document.getElementById('itemName').value;
+    function createAndAppendPinpoint(x, y) {
+        // Create a new pinpoint element
+        var newPinpoint = document.createElement('div');
+        newPinpoint.className = 'pinpoint';
+        newPinpoint.style.left = x + 'px';
+        newPinpoint.style.top = y + 'px';
+        document.getElementById('imageContainer').appendChild(newPinpoint);
+    }
 
-            // Remove previous pinpoints
-            clearPinpoints();
-
-            // Set the position of the new pinpoint
-            createAndAppendPinpoint(x, y);
-
-            // Update the name in the dropdown
-            updateDropdownName(x, name);
-        }
-
-        function updateDropdownName(key, name) {
-            // Update the "Icon" dropdown to display the name if available
-            var iconDropdown = document.getElementById('iconDropdown');
-            iconDropdown.options[iconDropdown.selectedIndex].text = name || key;
-        }
-
-        function clearPinpoints() {
-            // Remove all previous pinpoints
-            var previousPinpoints = document.getElementsByClassName('pinpoint');
-            while (previousPinpoints.length > 0) {
-                previousPinpoints[0].parentNode.removeChild(previousPinpoints[0]);
-            }
-        }
-
-        function createAndAppendPinpoint(x, y) {
-            // Create a new pinpoint element
-            var newPinpoint = document.createElement('div');
-            newPinpoint.className = 'pinpoint';
-            newPinpoint.style.left = x + 'px';
-            newPinpoint.style.top = y + 'px';
-            document.getElementById('imageContainer').appendChild(newPinpoint);
-        }
-
-        function saveItemName() {
-            // Get the entered coordinates, "tex," and name from the input fields
-            var x = document.getElementById('xCoordinate').value;
-            var selectedTex = document.getElementById('texDropdown').value;
-            var name = document.getElementById('itemName').value;
-
-            // Update the name in the JSON
-            jsonData.source[selectedTex].icon[x].itemName = name;
-
-            // Update the name in the "Icon" dropdown
-            updateDropdownName(x, name);
-        }
-        
-        function changeBackgroundColor() {
+    function changeBackgroundColor() {
         // Get the selected color from the input
         var newColor = document.getElementById('backgroundColorInput').value;
 
@@ -288,24 +355,23 @@
         document.body.style.backgroundColor = newColor;
     }
 
-        // Add a click event listener to the image
-        document.getElementById('pinpointImage').addEventListener('click', function(event) {
-            // Get the coordinates of the click relative to the image
-            var x = event.offsetX;
-            var y = event.offsetY;
+    // Add a click event listener to the image
+    document.getElementById('pinpointImage').addEventListener('click', function(event) {
+        // Get the coordinates of the click relative to the image
+        var x = event.offsetX;
+        var y = event.offsetY;
 
-            // Set the values of the input fields
-            document.getElementById('itemName').value = '';
-            document.getElementById('xCoordinate').value = x;
-            document.getElementById('yCoordinate').value = y;
+        // Set the values of the input fields
+        document.getElementById('itemName').value = '';
+        document.getElementById('xCoordinate').value = x;
+        document.getElementById('yCoordinate').value = y;
 
-            // Remove previous pinpoints
-            clearPinpoints();
+        clearPinpoints();
 
-            // Set the position of the new pinpoint
-            createAndAppendPinpoint(x, y);
-        });
-    </script>
+        // Set the position of the new pinpoint
+        createAndAppendPinpoint(x, y);
+    });
+</script>
 
 </body>
 </html>
