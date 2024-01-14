@@ -296,8 +296,17 @@
     }
 
     function saveUpdatedJson() {
-        // Convert the updated JSON object to a string
-        var updatedJsonString = JSON5.stringify(jsonData, null, 2);
+        // Get the original filename
+        var originalFilename = document.getElementById('jsonUpload').files[0]?.name || 'updated_data.json';
+
+        // Convert the updated JSON object to a string with quotes for all keys
+        var updatedJsonString = JSON.stringify(jsonData, (key, value) => {
+            // Exclude quotes for numeric values of specific keys
+            if (["height", "left", "originX", "originY", "top", "width"].includes(key)) {
+                return Number(value);
+            }
+            return value;
+        }, 2);
 
         // Create a Blob containing the updated JSON data
         var blob = new Blob([updatedJsonString], { type: 'application/json' });
@@ -305,7 +314,7 @@
         // Create a download link and trigger the download
         var link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'updated_data.json';
+        link.download = originalFilename;
         link.click();
     }
 
